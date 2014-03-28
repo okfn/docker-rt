@@ -1,0 +1,20 @@
+db:
+  image: orchardup/postgresql
+  ports:
+    - "5432"
+  environment:
+    POSTGRESQL_USER: rt_user
+    POSTGRESQL_PASS: docker
+    POSTGRESQL_DB: rt4
+  volumes:
+    - "/home/docker/pgdata:/var/lib/postgresql/9.1/main"
+rt:
+  build: .
+  ports:
+    - "80"
+  links:
+    - db
+  environment:
+    RT_DATABASE_PW: docker
+  volumes:
+    - "/home/docker/rtdata:/data"

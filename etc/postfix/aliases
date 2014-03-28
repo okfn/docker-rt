@@ -1,4 +1,4 @@
-root:		sysadmin@okfn.org
+root:		sysadmin@example.com
 
 MAILER-DAEMON:	postmaster
 postmaster:	root

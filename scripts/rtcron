@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec chpst -e /etc/container_environment -u www-data "$@"
