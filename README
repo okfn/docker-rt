@@ -1,0 +1,14 @@
+docker-rt
+=========
+
+This is a docker image for running Best Practical's RT (Request Tracker), a
+ticket tracking system.
+
+It's currently a work in progress, but it includes
+
+  RT
+  nginx
+  postfix + spamassassin
+
+And exposes the RT web interface on container port 80 and an RT-connected MTA on
+container port 25.
