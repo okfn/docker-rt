@@ -1,11 +1,10 @@
-FROM phusion/baseimage:0.9.9
+FROM phusion/baseimage:0.9.10
 MAINTAINER Open Knowledge System Administrators
 
 # Disable SSH
 RUN rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
 
 # Set up APT
-RUN echo 'deb http://us.archive.ubuntu.com/ubuntu/ precise universe' >> /etc/apt/sources.list
 RUN apt-get -q -y update
 
 # Install required packages
@@ -29,20 +28,25 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
 # Set up environment
 ENV PERL_MM_USE_DEFAULT 1
 ENV HOME /root
-ENV RT rt-4.2.3
+ENV RT rt-4.2.4
 ENV RTSRC ${RT}.tar.gz
+
+# Autoconfigure cpan
+RUN echo q | /usr/bin/perl -MCPAN -e shell
 
 # Install RT
 RUN mkdir /src
-WORKDIR /src
 ADD http://download.bestpractical.com/pub/rt/release/${RTSRC} /src/${RTSRC}
-RUN tar xzpvf /src/${RTSRC}
+RUN tar -C /src -xzpvf /src/${RTSRC}
 RUN ln -s /src/${RT} /src/rt
-WORKDIR /
 RUN cd /src/${RT} && ./configure --with-db-type=Pg --enable-gpg --enable-gd --enable-graphviz
-RUN make -C /src/${RT} testdeps 2>/dev/null | fgrep ...MISSING | cut -d' ' -f1 | sort -u | xargs cpanm
+# Install Capture::Tiny regardless of test failures for now
+RUN cpan -f Capture::Tiny
+RUN make -C /src/${RT} fixdeps
+RUN make -C /src/${RT} testdeps
 RUN make -C /src/${RT} install
 ADD ./scripts/rtcron /usr/bin/rtcron
+ADD ./scripts/rtinit /usr/bin/rtinit
 
 # Add system service config
 ADD ./etc/nginx.conf /etc/nginx/nginx.conf

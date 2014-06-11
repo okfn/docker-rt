@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+# Initialise database
+/opt/rt4/sbin/rt-setup-database --action init --skip-create
+
+# Initialise database for repeatticket extension
+cd /src/rt-extension-repeatticket
+/opt/rt4/sbin/rt-setup-database \
+  --action insert \
+  --datadir etc \
+  --datafile etc/initialdata \
+  --skip-create \
+  --package RT::Extension::RepeatTicket
+cd -
+
+# Set up full text indexing
+yes '' |
+/opt/rt4/sbin/rt-setup-fulltext-index \
+  --dba rt_user \
+  --dba-password "$DATABASE_PASSWORD"

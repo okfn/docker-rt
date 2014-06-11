@@ -12,3 +12,58 @@ It's currently a work in progress, but it includes
 
 And exposes the RT web interface on container port 80 and an RT-connected MTA on
 container port 25.
+
+from scratch
+------------
+
+Start a postgres container:
+
+  docker run -d \
+    -e POSTGRESQL_USER=rt_user \
+    -e POSTGRESQL_PASS=rt_pass \
+    -e POSTGRESQL_DB=rt4 \
+    --name rtdb \
+    orchardup/postgresql
+
+Run a one-off container to configure the database:
+
+  docker run \
+    --link rtdb:db \
+    -e DATABASE_USER=rt_user \
+    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_NAME=rt4 \
+    nickstenning/rt \
+    /usr/bin/rtinit
+
+Now the database is initialised and you can run RT proper:
+
+  docker run -d \
+    --link rtdb:db \
+    -p 25 \
+    -p 80 \
+    -e DATABASE_USER=rt_user \
+    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_NAME=rt4 \
+    nickstenning/rt
+
+To see the ports on which the web and mail interfaces are exposed, run `docker ps`.
+
+run against a pre-existing database
+-----------------------------------
+
+You can provide the DATABASE_HOST directly:
+
+  docker run -d \
+    -p 25 \
+    -p 80 \
+    -e DATABASE_HOST=dbserver \
+    -e DATABASE_USER=rt_user \
+    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_NAME=rt4 \
+    nickstenning/rt
+
+configuration
+-------------
+
+This image provides some limited support for customising the deployment using
+environment variables. See RT_SiteConfig.pm for details.
