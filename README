@@ -66,4 +66,10 @@ configuration
 -------------
 
 This image provides some limited support for customising the deployment using
-environment variables. See RT_SiteConfig.pm for details.
+environment variables.  See RT_SiteConfig.pm for the various variables which,
+can be defined to configure how the container starts up
+
+By default the postfix within the container will be set to relay (relay_host),
+ail to containers gateway IP address, to redefine `relay_host` use:
+
+  -e RELAY_IP='some.ip.goes.here'
