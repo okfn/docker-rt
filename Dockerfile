@@ -58,6 +58,8 @@ RUN chown -R root:root /etc/postfix
 RUN newaliases
 RUN mkdir -m 1777 /var/log/procmail
 ADD ./etc/logrotate.procmail /etc/logrotate.d/procmail
+RUN cp /etc/resolv.conf /var/spool/postfix/etc/
+RUN cp /etc/services /var/spool/postfix/etc/
 
 # Build RT and extensions
 ADD ./scripts/installext.sh /src/installext.sh
