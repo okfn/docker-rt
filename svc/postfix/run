@@ -12,11 +12,6 @@ sed -e "s/RELAY_IP/${RELAY_IP}/g" -i /etc/postfix/main.cf
 sed -e "s/WEB_DOMAIN/${WEB_DOMAIN}/g" -i /etc/postfix/main.cf
 sed -e "s/WEB_DOMAIN/${WEB_DOMAIN}/g" -i /etc/postfix/procmailrc.rt
 
-command_directory=$(postconf -h command_directory)
-daemon_directory=$("$command_directory"/postconf -h daemon_directory)
-
-# make consistency check
-"$command_directory"/postfix check
-
-# run Postfix
-exec "$daemon_directory"/master
+service postfix start
+sleep 5
+exec tail -F /var/log/mail.log
