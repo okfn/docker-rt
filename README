@@ -30,7 +30,7 @@ Run a one-off container to configure the database:
   docker run \
     --link rtdb:db \
     -e DATABASE_USER=rt_user \
-    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_PASSWORD=rt_pass \
     -e DATABASE_NAME=rt4 \
     nickstenning/rt \
     /usr/bin/rtinit
@@ -42,7 +42,7 @@ Now the database is initialised and you can run RT proper:
     -p 25 \
     -p 80 \
     -e DATABASE_USER=rt_user \
-    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_PASSWORD=rt_pass \
     -e DATABASE_NAME=rt4 \
     nickstenning/rt
 
@@ -58,7 +58,7 @@ You can provide the DATABASE_HOST directly:
     -p 80 \
     -e DATABASE_HOST=dbserver \
     -e DATABASE_USER=rt_user \
-    -e DATABASE_PASS=rt_pass \
+    -e DATABASE_PASSWORD=rt_pass \
     -e DATABASE_NAME=rt4 \
     nickstenning/rt
 
@@ -66,4 +66,10 @@ configuration
 -------------
 
 This image provides some limited support for customising the deployment using
-environment variables. See RT_SiteConfig.pm for details.
+environment variables.  See RT_SiteConfig.pm for the various variables which,
+can be defined to configure how the container starts up
+
+By default the postfix within the container will be set to relay (relay_host),
+ail to containers gateway IP address, to redefine `relay_host` use:
+
+  -e RELAY_IP='some.ip.goes.here'
