@@ -32,10 +32,9 @@ Start a postgres container:
     postgres
 ```
 Build the rt image.
+
 ```
-cd rt
 docker build -t rt4 .
-cd ..
 ```
 
 Run a one-off container to configure the database:
