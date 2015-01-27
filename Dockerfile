@@ -62,6 +62,8 @@ RUN chown -R root:root /etc/postfix
 RUN newaliases
 RUN mkdir -m 1777 /var/log/procmail
 ADD ./etc/logrotate.procmail /etc/logrotate.d/procmail
+ADD scripts/postfixinit /etc/my_init.d/10_update_postfix_config.sh
+
 # Build RT and extensions
 ADD ./scripts/installext.sh /src/installext.sh
 RUN /src/installext.sh https://github.com/bestpractical/rt-extension-mergeusers

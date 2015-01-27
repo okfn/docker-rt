@@ -3,8 +3,8 @@
 set -e
 
 # Initialise database
-/opt/rt4/sbin/rt-setup-database --action init 
-# --skip-create
+/opt/rt4/sbin/rt-setup-database --action init \
+  --dba $DBA_USER --dba-password $DBA_PASSWORD
 
 # Initialise database for repeatticket extension
 #cd /src/rt-extension-repeatticket
@@ -19,5 +19,5 @@ set -e
 # Set up full text indexing
 yes '' |
 /opt/rt4/sbin/rt-setup-fulltext-index \
-  --dba rt_user \
-  --dba-password "$DATABASE_PASSWORD"
+  --dba $DBA_USER \
+  --dba-password "$DBA_PASSWORD"
