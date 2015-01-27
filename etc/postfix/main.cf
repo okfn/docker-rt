@@ -1,5 +1,5 @@
 myhostname = rt.example.org
-mydomain = example.org
+mydomain = $myhostname
 myorigin = $myhostname
 inet_interfaces = all
 mydestination = $myhostname
