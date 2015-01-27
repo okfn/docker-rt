@@ -23,10 +23,10 @@ Plugin( "RT::Extension::SpawnLinkedTicketInQueue" );
 Plugin( "RT::Extension::CommandByMail" );
 Set( @MailPlugins, qw(Auth::MailFrom Filter::TakeAction) );
 
-Plugin( "RT::Extension::RepeatTicket" );
-Set( $RepeatTicketCoexistentNumber, 1 );
-Set( $RepeatTicketLeadTime, 14 );
-Set( $RepeatTicketSubjectFormat, '__Subject__' );
+# Plugin( "RT::Extension::RepeatTicket" );
+# Set( $RepeatTicketCoexistentNumber, 1 );
+# Set( $RepeatTicketLeadTime, 14 );
+# Set( $RepeatTicketSubjectFormat, '__Subject__' );
 
 Set( %FullTextSearch,
     Enable     => 1,

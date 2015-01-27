@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.9.10
-MAINTAINER Open Knowledge System Administrators
+MAINTAINER Justin Dossey <justin.dossey@newcontext.com>
 
 # Disable SSH
 RUN rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
@@ -23,12 +23,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
   procmail \
   razor \
   spamassassin \
-  spawn-fcgi
+  spawn-fcgi \
+  libgd-dev \
+  libgd-text-perl \
+  libgd-graph-perl
+
 
 # Set up environment
 ENV PERL_MM_USE_DEFAULT 1
 ENV HOME /root
-ENV RT rt-4.2.4
+ENV RT rt-4.2.9
 ENV RTSRC ${RT}.tar.gz
 
 # Autoconfigure cpan
@@ -58,7 +62,6 @@ RUN chown -R root:root /etc/postfix
 RUN newaliases
 RUN mkdir -m 1777 /var/log/procmail
 ADD ./etc/logrotate.procmail /etc/logrotate.d/procmail
-
 # Build RT and extensions
 ADD ./scripts/installext.sh /src/installext.sh
 RUN /src/installext.sh https://github.com/bestpractical/rt-extension-mergeusers
@@ -66,8 +69,8 @@ RUN /src/installext.sh https://github.com/bestpractical/rt-extension-resetpasswo
 RUN /src/installext.sh https://github.com/bestpractical/rt-extension-activityreports
 RUN /src/installext.sh https://github.com/bestpractical/rt-extension-spawnlinkedticketinqueue
 RUN /src/installext.sh https://github.com/bestpractical/rt-extension-commandbymail
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-repeatticket
-RUN cp /src/rt-extension-repeatticket/bin/rt-repeat-ticket /opt/rt4/sbin
+# RUN /src/installext.sh https://github.com/bestpractical/rt-extension-repeatticket
+# RUN cp /src/rt-extension-repeatticket/bin/rt-repeat-ticket /opt/rt4/sbin
 RUN mkdir -p /opt/rt4/local/html/Callbacks/MyCallbacks/Elements/MakeClicky
 ADD ./misc/MakeClicky /opt/rt4/local/html/Callbacks/MyCallbacks/Elements/MakeClicky/Default
 
