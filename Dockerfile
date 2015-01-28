@@ -51,6 +51,7 @@ RUN make -C /src/${RT} testdeps
 RUN make -C /src/${RT} install
 ADD ./scripts/rtcron /usr/bin/rtcron
 ADD ./scripts/rtinit /usr/bin/rtinit
+ADD ./scripts/rtdata /usr/bin/rtdata
 
 # Add system service config
 ADD ./etc/nginx.conf /etc/nginx/nginx.conf
@@ -86,7 +87,7 @@ RUN mkdir /var/log/rt4 /var/log/spamd
 ADD ./svc /etc/service
 CMD ["/sbin/my_init"]
 
-VOLUME ["/data", "/etc/nginx/ssl"]
+VOLUME ["/data", "/etc/nginx/ssl", "/import"]
 EXPOSE 25
 EXPOSE 80
 EXPOSE 443

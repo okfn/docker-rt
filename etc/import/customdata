@@ -1,0 +1,26 @@
+use strict;
+use warnings;
+
+our @Queues = (
+    # some definitions here
+);
+
+our @Users = (
+    # some other definitions here
+);
+
+# Examples
+# push @Users, {
+#     Name        => 'bob',
+#     Password    => 'changethis',
+#     Privileged  => 1,
+#     Disabled    => 0,
+# };
+
+# push @Queues, {
+#     Name                => 'Service',
+#     CorrespondAddress   => 'service@example.com',
+#     CommentAddress      => 'service-comment@example.com',
+# };
+
+1;

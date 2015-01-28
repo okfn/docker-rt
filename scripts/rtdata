@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+/opt/rt4/sbin/rt-setup-database --action insert \
+  --datafile /import/$RT_DATAINIT \
+  --dba $DBA_USER \
+  --dba-password "$DBA_PASSWORD"

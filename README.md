@@ -50,6 +50,18 @@ Run a one-off container to configure the database:
     /usr/bin/rtinit
 ```
 
+Run a one-off container to load any required arbitrary data into the database
+```
+docker run \
+  --link rtdb:db \
+  -e DBA_USER=postgres \
+  -e DBA_PASSWORD=secret \
+  -e RT_DATAINIT=customdata \
+  -v /tmp/import:/import \
+  rt4:latest \
+  /usr/bin/rtdata
+```
+
 Now the database is initialised and you can run RT proper:
 ```
   docker run -d \
@@ -65,6 +77,7 @@ Now the database is initialised and you can run RT proper:
     -e WEB_PORT=80 \
     rt4:latest
 ```
+
 To see the ports on which the web and mail interfaces are exposed, run `docker ps`.
 
 run against a pre-existing database
