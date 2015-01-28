@@ -1,5 +1,5 @@
 Set( $rtname, $ENV{RT_NAME} || "example.com" );
-Set( $Organisation, $ENV{Organisation} || "example.com" );
+Set( $Organisation, $ENV{RT_ORG} || "example.com" );
 Set( $WebDomain, $ENV{WEB_DOMAIN} || "localhost" );
 Set( $WebPort, $ENV{WEB_PORT} || 80 );
 Set( $LogToSTDERR, $ENV{LOG_LEVEL} || "info" );

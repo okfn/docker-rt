@@ -56,11 +56,6 @@ ADD ./scripts/rtinit /usr/bin/rtinit
 ADD ./etc/nginx.conf /etc/nginx/nginx.conf
 ADD ./etc/crontab.root /var/spool/cron/crontabs/root
 
-# nginx SSL
-RUN mkdir -p /etc/nginx/ssl
-ADD ./etc/server.crt /etc/nginx/ssl/server.crt
-ADD ./etc/server.key /etc/nginx/ssl/server.key
-
 # Configure Postfix
 ADD ./etc/postfix /etc/postfix
 RUN chown -R root:root /etc/postfix
@@ -91,8 +86,9 @@ RUN mkdir /var/log/rt4 /var/log/spamd
 ADD ./svc /etc/service
 CMD ["/sbin/my_init"]
 
-VOLUME ["/data"]
+VOLUME ["/data", "/etc/nginx/ssl"]
 EXPOSE 25
+EXPOSE 80
 EXPOSE 443
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
