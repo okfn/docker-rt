@@ -1,0 +1,85 @@
+use strict;
+use warnings;
+
+our @Queues = (
+    # some definitions here
+);
+
+our @Users = (
+    # some other definitions here
+);
+
+our @Groups = (
+  # custom stuffs
+);
+
+our @ACL = {
+  # custom stuffs
+};
+
+# Examples
+push @Users, {
+    Name         => 'bob',
+    EmailAddress => 'bob@example.com',
+    Password     => 'password',
+    Privileged   => 1,
+    Disabled     => 0,
+};
+
+push @Users, {
+    Name         => 'alice',
+    EmailAddress => 'alice@example.com',
+    Password     => 'password',
+    Privileged   => 1,
+    Disabled     => 0,
+};
+
+push @Groups, {
+    Name        => 'Technicians',
+    Description => 'All of the Technicians',
+    Members     => {
+      Users =>  [ qw/ alice / ],
+    },
+};
+
+push @Groups, {
+    Name        => 'Coordinators',
+    Description => 'All of the Coordinators',
+    Members     => {
+      Users =>  [ qw/ bob / ],
+    },
+};
+
+push @Queues, {
+    Name                => 'Service',
+    CorrespondAddress   => 'service@example.com',
+    CommentAddress      => 'service-comment@example.com',
+};
+
+push @ACL, map {
+  {
+    Right       => $_,
+    GroupDomain => 'RT::System-Role',
+    GroupType   => 'Requestor',
+  }
+} qw(ShowTicket ReplyToTicket SeeQueue);
+
+push @ACL, map {
+  {
+    Queue       => 'Service',
+    Right       => $_,
+    GroupDomain => 'UserDefined',
+    GroupId     => 'Coordinators'
+  }
+} qw(CreateTicket ReplyToTicket SeeQueue ShowTicket);
+
+push @ACL, map {
+  {
+    Queue       => 'Service',
+    Right       => $_,
+    GroupDomain => 'UserDefined',
+    GroupId     => 'Technicians'
+  }
+} qw(CommentOnTicket ReplyToTicket SeeQueue ShowTicket DeleteTicket ForwardMessage ReassignTicket ModifyTicket OwnTicket StealTicket TakeTicket ShowTicketComments);
+
+1;
