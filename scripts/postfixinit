@@ -1,8 +1,5 @@
 #!/bin/bash
 # write in environment variable values to postfix config files
-sed -i "s/^\(myhostname\) *=.*/\1 = $RT_NAME/; \
-      s/^\(relayhost\) *=.*/\1 = $RT_SMTP_RELAY/;" \
-      /etc/postfix/main.cf
 sed -i "s/^\(\* \^X-RT-Loop-Prevention:\) .*/\1 $RT_NAME/; \
       s/^\(| rt-mailgate .*--url \)..*/\1 $WEB_DOMAIN/" \
       /etc/postfix/procmailrc.rt

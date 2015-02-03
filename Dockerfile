@@ -5,11 +5,10 @@ MAINTAINER Justin Dossey <justin.dossey@newcontext.com>
 RUN rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
 
 # Set up APT
-RUN apt-get -q -y update
-
-# Install required packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
+RUN apt-get -q -y update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
   build-essential \
+  ca-certificates \
   cpanminus \
   git \
   gnupg \
@@ -17,6 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
   libexpat1-dev \
   libgd2-noxpm-dev \
   libpq-dev \
+  mailutils \
   nginx-light \
   perl-modules \
   postfix \
@@ -26,7 +26,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
   spawn-fcgi \
   libgd-dev \
   libgd-text-perl \
-  libgd-graph-perl
+  libgd-graph-perl \
+  libsasl2-2 \
+  libsasl2-modules \
+  telnet \
+  vim && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
 # Set up environment
@@ -34,51 +40,57 @@ ENV PERL_MM_USE_DEFAULT 1
 ENV HOME /root
 ENV RT rt-4.2.9
 ENV RTSRC ${RT}.tar.gz
+ENV GITHUB https://github.com/bestpractical
+
+COPY ./scripts/rtcron /usr/bin/rtcron
+COPY ./scripts/rtinit /usr/bin/rtinit
+COPY ./scripts/rtdata /usr/bin/rtdata
+
+COPY ./scripts/installext.sh /src/installext.sh
+
+# Add system service config
+COPY ./etc/nginx.conf /etc/nginx/nginx.conf
+COPY ./etc/crontab.root /var/spool/cron/crontabs/root
+
+# Configure Postfix
+COPY ./etc/postfix /etc/postfix
+COPY ./etc/logrotate.procmail /etc/logrotate.d/procmail
+COPY scripts/postfixinit /etc/my_init.d/10_update_postfix_config.sh
 
 # Autoconfigure cpan
 RUN echo q | /usr/bin/perl -MCPAN -e shell
 
-# Install RT
-RUN mkdir /src
-ADD http://download.bestpractical.com/pub/rt/release/${RTSRC} /src/${RTSRC}
-RUN tar -C /src -xzpvf /src/${RTSRC}
-RUN ln -s /src/${RT} /src/rt
-RUN cd /src/${RT} && ./configure --with-db-type=Pg --enable-gpg --enable-gd --enable-graphviz
 # Install Capture::Tiny regardless of test failures for now
 RUN cpan -f Capture::Tiny
-RUN make -C /src/${RT} fixdeps
-RUN make -C /src/${RT} testdeps
-RUN make -C /src/${RT} install
-ADD ./scripts/rtcron /usr/bin/rtcron
-ADD ./scripts/rtinit /usr/bin/rtinit
-ADD ./scripts/rtdata /usr/bin/rtdata
 
-# Add system service config
-ADD ./etc/nginx.conf /etc/nginx/nginx.conf
-ADD ./etc/crontab.root /var/spool/cron/crontabs/root
+# Install RT
+RUN mkdir -p /src && \
+  curl -sSL http://download.bestpractical.com/pub/rt/release/${RTSRC} | \
+  tar -C /src -xz && \
+  ln -s /src/${RT} /src/rt && \
+  cd /src/${RT} && \
+  ./configure --with-db-type=Pg --enable-gpg --enable-gd --enable-graphviz && \
+  make -C /src/${RT} fixdeps && \
+  make -C /src/${RT} testdeps && \
+  make -C /src/${RT} install && \
+  /src/installext.sh ${GITHUB}/rt-extension-mergeusers && \
+  /src/installext.sh ${GITHUB}/rt-extension-resetpassword && \
+  /src/installext.sh ${GITHUB}/rt-extension-activityreports && \
+  /src/installext.sh ${GITHUB}/rt-extension-spawnlinkedticketinqueue && \
+  /src/installext.sh ${GITHUB}/rt-extension-commandbymail && \
+  rm -rf /src
 
-# Configure Postfix
-ADD ./etc/postfix /etc/postfix
 RUN chown -R root:root /etc/postfix
 RUN newaliases
 RUN mkdir -m 1777 /var/log/procmail
-ADD ./etc/logrotate.procmail /etc/logrotate.d/procmail
-ADD scripts/postfixinit /etc/my_init.d/10_update_postfix_config.sh
 
 # Build RT and extensions
-ADD ./scripts/installext.sh /src/installext.sh
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-mergeusers
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-resetpassword
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-activityreports
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-spawnlinkedticketinqueue
-RUN /src/installext.sh https://github.com/bestpractical/rt-extension-commandbymail
-# RUN /src/installext.sh https://github.com/bestpractical/rt-extension-repeatticket
-# RUN cp /src/rt-extension-repeatticket/bin/rt-repeat-ticket /opt/rt4/sbin
+
 RUN mkdir -p /opt/rt4/local/html/Callbacks/MyCallbacks/Elements/MakeClicky
 ADD ./misc/MakeClicky /opt/rt4/local/html/Callbacks/MyCallbacks/Elements/MakeClicky/Default
 
 # Configure RT
-ADD ./RT_SiteConfig.pm /opt/rt4/etc/RT_SiteConfig.pm
+COPY ./RT_SiteConfig.pm /opt/rt4/etc/RT_SiteConfig.pm
 RUN mv /opt/rt4/var /data
 RUN ln -s /data /opt/rt4/var
 
@@ -92,6 +104,5 @@ EXPOSE 25
 EXPOSE 80
 EXPOSE 443
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # vim:ts=8:noet:

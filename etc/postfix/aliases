@@ -1,4 +1,4 @@
-root:		sysadmin@example.com
+root:		brandon.raabe@newcontext.com
 
 MAILER-DAEMON:	postmaster
 postmaster:	root
@@ -27,3 +27,5 @@ www-data:	/dev/null
 
 rt:		"|/usr/bin/procmail -m ACTION=correspond QUEUE=general /etc/postfix/procmailrc.rt"
 rt-comment:	"|/usr/bin/procmail -m ACTION=comment QUEUE=general /etc/postfix/procmailrc.rt"
+service:   "|/usr/bin/procmail -m ACTION=correspond QUEUE=service /etc/postfix/procmailrc.rt"
+service-comment: "|/usr/bin/procmail -m ACTION=comment QUEUE=service /etc/postfix/procmailrc.rt"
